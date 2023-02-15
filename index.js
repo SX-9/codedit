@@ -17,7 +17,7 @@ app.get("/api/ls", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  let ptyProcess = pty.spawn(require("os").platform() === "win32" ? "powershell.exe" : "zsh", [], {
+  let ptyProcess = pty.spawn(process.env.SHELL, [], {
     name: process.env.TERMINAL,
     cols: 100,
     rows: 11,

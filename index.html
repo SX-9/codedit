@@ -99,7 +99,7 @@
       async function ls() {
         let res = await fetch("/api/ls");
         let files = await res.json();
-
+	document.getElementById("files").innerHTML = "";
         files.forEach(file => {
           let el = document.createElement("p");
           el.innerText = file;
