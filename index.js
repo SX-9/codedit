@@ -9,11 +9,17 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
+app.use(express.json());
 app.use(cors({ origin: "*" }));
-
 app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"));
+app.use("/api/cat", express.static(process.cwd()));
 app.get("/api/ls", (req, res) => {
   res.json(fs.readdirSync(process.cwd()));
+});
+app.post("/api/echo", (req, res) => {
+  let { file, contents } = req.body;
+  fs.writeFileSync(file, contents);
+  res.json({ success: true });
 });
 
 io.on("connection", (socket) => {

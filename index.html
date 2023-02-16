@@ -15,7 +15,7 @@
         cursor: pointer;
       }
       body {
-        overflow: hidden;
+        overflow-y: hidden;
         height: 100vh;
         background: #1d1d1d;
         display: grid;
@@ -46,7 +46,7 @@
         border: none;
         resize: none;
         width: 100%;
-        height: 100%;
+        height: 83%;
         margin: .5em;
       }
       h3 { text-align: center; }
@@ -61,6 +61,7 @@
       div#files {
         background: #181818;
         grid-area: files;
+        border-right: .1em white solid ;
       }
       div#editor { grid-area: edit; }
       div#terminal { grid-area: term; }
@@ -73,7 +74,6 @@
         <span id="save" class="item">Save</span>
         <span id="new" class="item">New</span>
         <span id="open" class="item">Open</span>
-        <span id="conf" class="item">Settings</span>
         <span id="refresh" class="item">Refresh</span>
       </p>
     </div>
@@ -81,6 +81,8 @@
       <h3>Explorer</h3>
     </div>
     <div id="editor">
+      <h3 id="title">Editor</h3>
+      <hr size="1">
       <textarea id="file">Hello World!</textarea>
     </div>
     <div id="terminal"></div>
@@ -96,18 +98,43 @@
         socket.emit("terminal.keystroke", data);
       });
 
+      async function cat() {
+        let file = this.innerText !== "Open" ? this.innerText : prompt("Enter A File To Edit:");
+        document.getElementById("title").innerText = file;
+        let res = await fetch("/api/cat/" + file);
+        let contents = await res.text();
+        document.getElementById("file").value = contents;
+      }
+
       async function ls() {
         let res = await fetch("/api/ls");
         let files = await res.json();
-	document.getElementById("files").innerHTML = "";
+	document.getElementById("files").innerHTML = "<h3>Explorer</h3>";
         files.forEach(file => {
           let el = document.createElement("p");
           el.innerText = file;
-          el.onclick = ls;
+          el.onclick = cat;
           el.classList.add("file");
           document.getElementById("files").appendChild(el);
         });
       }
+
+      function echo() {
+        let contents = document.getElementById("file").value;
+        let file = document.getElementById("title").innerText;
+        fetch("/api/echo", {
+          method: "POST",
+          body: JSON.stringify({
+            file: file,
+            contents: contents,
+          }),
+        }).then(res => res.json()).then(d => {
+          alert(d.success ? "Success!" : "Failed!");
+        });
+      }
+
+      document.getElementById("save").onclick = echo;
+      document.getElementById("open").onclick = cat;
       document.getElementById("refresh").onclick = ls;
       ls();
     </script>
