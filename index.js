@@ -11,10 +11,17 @@ const io = new Server(httpServer);
 
 app.use(express.json());
 app.use(cors({ origin: "*" }));
+
 app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"));
 app.use("/api/cat", express.static(process.cwd()));
-app.get("/api/ls", (req, res) => {
-  res.json(fs.readdirSync(process.cwd()));
+app.get("/api/ls", (req, res) => res.json(fs.readdirSync(process.cwd())));
+app.get("/api/touch/:name", (req, res) => {
+  fs.writeFileSync(req.params.name, "");
+  res.json({ success: true });
+});
+app.get("/api/rm/:name", (req, res) => {
+  fs.unlinkSync(req.params.name);
+  res.json({ success: true });
 });
 app.post("/api/echo", (req, res) => {
   let { file, contents } = req.body;
@@ -23,10 +30,10 @@ app.post("/api/echo", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  let ptyProcess = pty.spawn(process.env.SHELL, [], {
+  let ptyProcess = pty.spawn(process.platform === "win32" ? "powershell.exe" : process.env.SHELL, [], {
     name: process.env.TERMINAL,
-    cols: 100,
-    rows: 11,
+    cols: 120,
+    rows: 12,
     cwd: process.cwd(),
     env: process.env,
   });

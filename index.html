@@ -10,31 +10,35 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
     <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
+  	<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.3.0/lib/xterm-addon-fit.js"></script> 
     <style>
       * {
         cursor: pointer;
       }
       body {
-        overflow-y: hidden;
+        overflow: hidden;
         height: 100vh;
+        width: 100vw;
         background: #1d1d1d;
         display: grid;
         grid-template-areas:
           "bar files edit"
           "bar files term";
         grid-template-columns: 3em 12em 1fr;
-        grid-template-rows: 1fr 12em;
+        grid-template-rows: 1fr 15em;
         padding: 0;
         margin: 0;
       }
 
-      p, textarea, h3 {
+      p,
+      textarea,
+      h3 {
         font-family: monospace;
         color: white;
       }
       p.file {
-        margin: .5em;
-        padding-left: .5em;
+        margin: 0.5em;
+        padding-left: 0.5em;
         text-decoration: underline;
       }
       div#sidebar > p {
@@ -45,12 +49,16 @@
         background: none;
         border: none;
         resize: none;
-        width: 100%;
-        height: 83%;
-        margin: .5em;
+        width: 98%;
+        height: 80%;
+        margin: 0.5em;
       }
-      h3 { text-align: center; }
-      span.item { padding: 1em; }
+      h3 {
+        text-align: center;
+      }
+      span.item {
+        padding: 1em;
+      }
 
       div#sidebar {
         background: #333333;
@@ -61,10 +69,16 @@
       div#files {
         background: #181818;
         grid-area: files;
-        border-right: .1em white solid ;
+        border-right: 0.1em white solid;
       }
-      div#editor { grid-area: edit; }
-      div#terminal { grid-area: term; }
+      div#editor {
+        grid-area: edit;
+      }
+      div#terminal {
+        grid-area: term;
+        width: 100%;
+        height: 100%;
+      }
     </style>
     <title>CodedIt Editor</title>
   </head>
@@ -74,6 +88,7 @@
         <span id="save" class="item">Save</span>
         <span id="new" class="item">New</span>
         <span id="open" class="item">Open</span>
+        <span id="del" class="item">Delete</span>
         <span id="refresh" class="item">Refresh</span>
       </p>
     </div>
@@ -82,14 +97,17 @@
     </div>
     <div id="editor">
       <h3 id="title">Editor</h3>
-      <hr size="1">
+      <hr size="1" />
       <textarea id="file">Hello World!</textarea>
     </div>
     <div id="terminal"></div>
     <script>
       const socket = io("ws://localhost:8075");
-      const term = new Terminal();
+      const term = new Terminal(),
+        f = new FitAddon.FitAddon();
 
+      term.loadAddon(f);
+      f.fit();
       term.open(document.getElementById("terminal"));
       socket.on("terminal.incomingData", (data) => {
         term.write(data);
@@ -99,7 +117,10 @@
       });
 
       async function cat() {
-        let file = this.innerText !== "Open" ? this.innerText : prompt("Enter A File To Edit:");
+        let file =
+          this.innerText !== "Open"
+            ? this.innerText
+            : prompt("Enter A File To Edit:");
         document.getElementById("title").innerText = file;
         let res = await fetch("/api/cat/" + file);
         let contents = await res.text();
@@ -109,8 +130,8 @@
       async function ls() {
         let res = await fetch("/api/ls");
         let files = await res.json();
-	document.getElementById("files").innerHTML = "<h3>Explorer</h3>";
-        files.forEach(file => {
+        document.getElementById("files").innerHTML = "<h3>Explorer</h3>";
+        files.forEach((file) => {
           let el = document.createElement("p");
           el.innerText = file;
           el.onclick = cat;
@@ -124,15 +145,37 @@
         let file = document.getElementById("title").innerText;
         fetch("/api/echo", {
           method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             file: file,
             contents: contents,
           }),
-        }).then(res => res.json()).then(d => {
-          alert(d.success ? "Success!" : "Failed!");
-        });
+        })
+          .then((res) => res.json())
+          .then((d) => {
+            alert(d.success ? "Success!" : "Failed!");
+          });
       }
 
+      async function touch() {
+        let res = await fetch("/api/touch/" + prompt("File Name:"));
+        let mess = await res.json();
+        alert(mess.success ? "Success!" : "Failed!");
+        ls();
+      }
+
+      async function rm(name) {
+        let res = await fetch("/api/rm/" + name);
+        let mess = await res.json();
+        ls();
+        return mess;
+      }
+
+      document.getElementById("del").onclick = () => alert(rm(prompt("File Name:")).success ? "Success!" : "Failed!");
+      document.getElementById("new").onclick = touch;
       document.getElementById("save").onclick = echo;
       document.getElementById("open").onclick = cat;
       document.getElementById("refresh").onclick = ls;
