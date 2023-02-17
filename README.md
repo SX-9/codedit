@@ -8,4 +8,7 @@ VSCode Is Too Much For My PC To Handle (_Potato PC_) And I Want A Code Editor Th
 This Project Has **A Lot Of Bugs**, If You Want To Fix Them Feel Free To Open A **Pull Request**!
 
 # How To Use:
-If You Have Both NodeJS And NPM Installed Then
+If You Have Both NodeJS And NPM Installed Then Do:
+```bash
+npx codedit@latest
+```
