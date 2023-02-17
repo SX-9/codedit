@@ -18,7 +18,7 @@ app.use(cors({
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send(fs.readFileSync("./index.html", "utf8")
+  res.send(fs.readFileSync("index.html", "utf8")
   .replace("/* c1 */", "#1d1d1d")
   .replace("/* c2 */", "#181818")
   .replace("/* c3 */", "#333333")
