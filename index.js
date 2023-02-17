@@ -11,19 +11,37 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
+app.use(cors({
+  methods: ["GET","POST","DELETE"],
+  origin: ["localhost","127.0.0.1"],
+}));
 app.use(express.json());
-app.use(cors({ origin: "*" }));
 
-app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"));
-app.use("/api/cat", express.static(process.cwd()));
-app.get("/api/ls", (req, res) => res.json(fs.readdirSync(process.cwd())));
-app.get("/api/touch/:name", (req, res) => {
-  fs.writeFileSync(req.params.name, "");
-  res.json({ success: true });
+app.get("/", (req, res) => {
+  res.send(fs.readFileSync("./index.html", "utf8")
+  .replace("/* c1 */", "#1d1d1d")
+  .replace("/* c2 */", "#181818")
+  .replace("/* c3 */", "#333333")
+  );
 });
-app.get("/api/rm/:name", (req, res) => {
-  fs.unlinkSync(req.params.name);
-  res.json({ success: true });
+
+app.use("/api/cat", express.static(process.cwd()));
+app.get("/api/ls", (req, res) => res.json(fs.readdirSync(process.cwd()).filter(item => !item.startsWith("."))));
+app.post("/api/touch/:name", (req, res) => {
+  try {
+    fs.writeFileSync(req.params.name, "");
+    res.json({ success: true });
+  } catch {
+    res.json({ success: false });
+  }
+});
+app.delete("/api/rm/:name", (req, res) => {
+  try {
+    fs.unlinkSync(req.params.name);
+    res.json({ success: true });
+  } catch {
+    res.json({ success: false });
+  }
 });
 app.post("/api/echo", (req, res) => {
   let { file, contents } = req.body;
@@ -49,4 +67,4 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(8075, () => console.log("Online On Port 8075"));
+httpServer.listen(8075, () => console.log("Code At http://localhost:8075"));

@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css"
-    />
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css"/>
     <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
     <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
   	<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.3.0/lib/xterm-addon-fit.js"></script> 
     <style>
+      :root {
+        --editor-color: /* c1 */;
+        --explorer-color: /* c2 */;
+        --sidebar-color: /* c3 */;
+      }
+
       * {
         cursor: pointer;
       }
@@ -19,7 +22,7 @@
         overflow: hidden;
         height: 100vh;
         width: 100vw;
-        background: #1d1d1d;
+        background: var(--editor-color);
         display: grid;
         grid-template-areas:
           "bar files edit"
@@ -61,13 +64,16 @@
       }
 
       div#sidebar {
-        background: #333333;
+        background: var(--sidebar-color);
         grid-area: bar;
         display: flex;
         justify-content: center;
       }
       div#files {
-        background: #181818;
+        height: 100vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        background: var(--explorer-color);
         grid-area: files;
         border-right: 0.1em white solid;
       }
@@ -161,14 +167,14 @@
       }
 
       async function touch() {
-        let res = await fetch("/api/touch/" + prompt("File Name:"));
+        let res = await fetch("/api/touch/" + prompt("File Name:"), { method: "POST" });
         let mess = await res.json();
         alert(mess.success ? "Success!" : "Failed!");
         ls();
       }
 
       async function rm(name) {
-        let res = await fetch("/api/rm/" + name);
+        let res = await fetch("/api/rm/" + name, { method: "DELETE" });
         let mess = await res.json();
         ls();
         return mess;

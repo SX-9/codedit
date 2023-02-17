@@ -2,7 +2,10 @@
 A Lightweight VSCode Alternative
 
 # Why I Made This?
-VSCode Is Too Much For My PC To Handle (Its Just That My PC IS Super Weak) And I Want A Code Editor That Looks Like VSCode, So I Decided On Atom But Its Still Too Slow And Being Discontinued, So I Made My Own Editor With The Features I Need!
+VSCode Is Too Much For My PC To Handle (_Potato PC_) And I Want A Code Editor That Looks Like VSCode, So I Decided On Atom But Its Being _Discontinued_, So I Made My Own Editor With _Basic Functionality_!
 
 # Still In Development!
-This Project Is Still Being Developed And No Releases Yet, If You Want To Help Contact Me On Discord (sx9dev#1151)
+This Project Has **A Lot Of Bugs**, If You Want To Fix Them Feel Free To Open A **Pull Request**!
+
+# How To Use:
+If You Have Both NodeJS And NPM Installed Then
