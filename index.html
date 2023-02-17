@@ -10,16 +10,19 @@
   	<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.3.0/lib/xterm-addon-fit.js"></script> 
     <style>
       :root {
-        --editor-color: /* c1 */;
-        --explorer-color: /* c2 */;
-        --sidebar-color: /* c3 */;
+        --editor-color: #1d1d1d;
+        --explorer-color: #181818;
+        --sidebar-color: #333333;
       }
 
       * {
         cursor: pointer;
       }
-      body {
-        overflow: hidden;
+      div#body {
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow-y: hidden;
         height: 100vh;
         width: 100vw;
         background: var(--editor-color);
@@ -89,24 +92,26 @@
     <title>CodedIt Editor</title>
   </head>
   <body>
-    <div id="sidebar">
-      <p id="save">
-        <span id="save" class="item">Save</span>
-        <span id="new" class="item">New</span>
-        <span id="open" class="item">Open</span>
-        <span id="del" class="item">Delete</span>
-        <span id="refresh" class="item">Refresh</span>
-      </p>
+    <div id="body">
+      <div id="sidebar">
+        <p id="save">
+          <span id="save" class="item">Save</span>
+          <span id="new" class="item">New</span>
+          <span id="open" class="item">Open</span>
+          <span id="del" class="item">Delete</span>
+          <span id="refresh" class="item">Refresh</span>
+        </p>
+      </div>
+      <div id="files">
+        <h3>Explorer</h3>
+      </div>
+      <div id="editor">
+        <h3 id="title">Editor</h3>
+        <hr size="1" />
+        <textarea id="file">Hello World!</textarea>
+      </div>
+      <div id="terminal"></div>
     </div>
-    <div id="files">
-      <h3>Explorer</h3>
-    </div>
-    <div id="editor">
-      <h3 id="title">Editor</h3>
-      <hr size="1" />
-      <textarea id="file">Hello World!</textarea>
-    </div>
-    <div id="terminal"></div>
     <script>
       const socket = io("ws://localhost:8075");
       const term = new Terminal(),
